@@ -6,9 +6,12 @@ module.exports = {
         uri: 'mongodb+srv://' + credentials.auth.username + ':' + credentials.auth.password + '@cluster0.ppscmeu.mongodb.net/?retryWrites=true&w=majority',
         collections: {
             users: 'users',
+            levels: 'levels',
+            types: 'types',
             apiaries: 'apiaries',
             hives: 'hives',
-            data: 'data'
+            events: 'events',
+            interventions: 'interventions'
         }
     },
     auth: {
