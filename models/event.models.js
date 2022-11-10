@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const interventiontSchema = new Schema({
+const interventionSchema = new Schema({
     device: String,
     type: String,
     active: Boolean,
