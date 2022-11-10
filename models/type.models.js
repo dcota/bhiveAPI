@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 
 const typeSchema = new Schema({
     type: String,
+    typename: String,
     registration_date: {
         type: Date,
         default: Date.now
