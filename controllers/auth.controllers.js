@@ -1,4 +1,4 @@
-const User = require('../models/user.models')
+const USER = require('../models/user.models')
 const {
     validationResult
 } = require('express-validator')
@@ -18,7 +18,7 @@ exports.login = (req, res) => {
     if (errors.length > 0) return res.status(406).send(errors)
     let username = req.body.username
     let password = req.body.password
-    User.findOne({ 'auth.username': username })
+    USER.findOne({ 'auth.username': username })
         .exec()
         .then((user, error) => {
             if (error) throw error
@@ -26,7 +26,7 @@ exports.login = (req, res) => {
                 return res.header('Authorization', null).status(authMessages.error.e0.http).send(authMessages.error.e0)
                     //if device doesnt exist in array add
             if (!user.devices.includes(req.body.device)) { //check if deviceid already exixts
-                User.findOneAndUpdate({ 'auth.username': username }, { $push: { 'devices': req.body.device } }, { new: true })
+                USER.findOneAndUpdate({ 'auth.username': username }, { $push: { 'devices': req.body.device } }, { new: true })
                     .exec()
                     .then((_user, error) => {
                         let payload = {
@@ -87,7 +87,7 @@ exports.checkAuth = (req, res, callback) => {
     let token = req.headers.authorization
     if (!token) return res.status(authMessages.error.e1.http).send(authMessages.error.e1)
     let payload = JWT.decode(token)
-    User.findOne({
+    USER.findOne({
             'auth.public_key': payload.pk
         })
         .exec()

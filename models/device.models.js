@@ -3,27 +3,26 @@ const Schema = mongoose.Schema
 
 const deviceSchema = new Schema({
     user: String,
+    deviceref: String,
     apiary: String,
     registered: Boolean,
+    assigned: Boolean,
     location: {
         lat: Number,
         lon: Number
     },
-    data: [
-        {
-            tempIn: Number, 
-            tempOut: Number,
-            humIn: Number,
-            humOut: Number,
-            weight: Number,
-            soundLevel: Number,
-            date: {
-                type: Date,
-                default: Date.now
-            }
-        },
-
-    ],
+    data: [{
+        tempIn: Number,
+        tempOut: Number,
+        humIn: Number,
+        humOut: Number,
+        weight: Number,
+        soundLevel: Number,
+        date: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     registration_date: {
         type: Date,
         default: Date.now

@@ -31,12 +31,12 @@ router.route('/')
 
 router.route('/:id')
     .get([param('id').isMongoId()], userController.getone) //authController.checkAuth
-    .put([param('id').isMongoId()], userController.put) //authController.checkAuth
+    //.put([param('id').isMongoId()], userController.put) //authController.checkAuth
     .delete([param('id').isMongoId()], userController.delete) //authController.checkAuth
     .patch([param('id').isMongoId()], userController.update) //authController.checkAuth
 
-router.route('/report/:id')
-    .patch([param('id').isMongoId()], userController.report)
+/*router.route('/report/:id')
+    .patch([param('id').isMongoId()], userController.report)*/
 
 router.route('/changepass/:id')
     .patch([param('id').isMongoId(), body('newpass').isString()], userController.setNewPass) ///authController.checkAuth

@@ -1,6 +1,6 @@
 const JWT = require('jsonwebtoken')
 const CONFIG = require('../config/config');
-const User = require('../models/user.models');
+const USER = require('../models/user.models');
 const userMessages = require('../messages/user.messages')
 const bcrypt = require('bcryptjs')
 const {
@@ -10,7 +10,7 @@ const {
 exports.create = (req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
-    User.findOne({ 'email': req.body.email })
+    USER.findOne({ 'email': req.body.email })
         .exec()
         .then((user) => {
             if (user) res.status(userMessages.success.s3.http).send(userMessages.success.s3)
@@ -61,7 +61,7 @@ exports.create = (req, res) => {
 exports.get = ((req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
-    User.find()
+    USER.find()
         .exec()
         .then((user, error) => {
             console.log(user)
@@ -77,12 +77,12 @@ exports.get = ((req, res) => {
 
 })
 
-exports.put = (req, res) => {
+/*exports.put = (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length > 0) {
         return res.status(406).send(errors)
     }
-    User.findOneAndUpdate({ '_id': { $eq: req.params.id } }, { $set: { 'accepted': true } }, { new: true })
+    USER.findOneAndUpdate({ '_id': { $eq: req.params.id } }, { $set: { 'accepted': true } }, { new: true })
         .exec()
         .then((user, error) => {
             if (error) throw error
@@ -94,30 +94,7 @@ exports.put = (req, res) => {
         .catch((error) => {
             return res.status(userMessages.error.e1.http).send(userMessages.error.e1)
         })
-}
-
-exports.report = (req, res) => {
-    const errors = validationResult(req).array()
-    if (errors.length > 0) {
-        return res.status(406).send(errors)
-    }
-    User.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
-            $set: {
-                'reported': true
-            }
-        }, { new: true })
-        .exec()
-        .then((user) => {
-            if (!user)
-                return res.status(userMessages.error.e0.http).send(userMessages.error.e0)
-            let message = userMessages.success.s6
-            message.body = user
-            return res.status(message.http).send(message)
-        })
-        .catch(() => {
-            return res.status(userMessages.error.e1.http).send(userMessages.error.e1)
-        })
-}
+}*/
 
 exports.update = (req, res) => {
     const errors = validationResult(req).array()
@@ -128,11 +105,11 @@ exports.update = (req, res) => {
     let finalPath;
     if (req.file) {
         finalPath = 'https://safeharbor.duartecota.com/' + req.file.path.replace(/\\/, '/')
-        User.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
+        USER.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
                 $set: {
                     'firstname': req.body.firstname,
                     'lastname': req.body.lastname,
-                    'country': req.body.country,
+                    'nif': req.body.country,
                     'bdate': req.body.bdate,
                     'mobile': req.body.mobile,
                     'email': req.body.email,
@@ -151,14 +128,14 @@ exports.update = (req, res) => {
                 return res.status(userMessages.error.e1.http).send(userMessages.error.e1)
             })
     } else {
-        User.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
+        USER.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
                 $set: {
                     'firstname': req.body.firstname,
                     'lastname': req.body.lastname,
-                    'country': req.body.country,
+                    'nif': req.body.country,
                     'bdate': req.body.bdate,
                     'mobile': req.body.mobile,
-                    'email': req.body.email
+                    'email': req.body.email,
                 }
             }, { new: true })
             .exec()
@@ -180,7 +157,7 @@ exports.delete = (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length > 0)
         return res.status(406).send(errors)
-    User.deleteOne({ '_id': { $eq: req.params.id } })
+    USER.deleteOne({ '_id': { $eq: req.params.id } })
         .exec()
         .then((user) => {
             if (user.deletedCount <= 0)
@@ -198,7 +175,7 @@ exports.getone = (req, res) => {
     if (errors.length > 0) {
         return res.status(406).send(errors)
     }
-    User.findOne({ '_id': { $eq: req.params.id } })
+    USER.findOne({ '_id': { $eq: req.params.id } })
         .exec()
         .then((user) => {
             if (!user)
@@ -207,7 +184,7 @@ exports.getone = (req, res) => {
             const usr = {
                 firstname: user.firstname,
                 lastname: user.lastname,
-                country: user.country,
+                nif: user.nif,
                 email: user.email,
                 mobile: user.mobile,
                 type: user.type,
@@ -229,7 +206,7 @@ exports.setNewPass = (req, res) => {
         return res.status(406).send(errors)
     }
     let newpass = bcrypt.hashSync(escape(req.body.newpass), bcrypt.genSaltSync(2))
-    User.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
+    USER.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
             $set: {
                 'auth.password': newpass
             }

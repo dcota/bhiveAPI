@@ -1,8 +1,5 @@
-const JWT = require('jsonwebtoken')
-const CONFIG = require('../config/config');
-const Type = require('../models/type.models');
+const TYPE = require('../models/type.models');
 const typeMessages = require('../messages/type.messages')
-const bcrypt = require('bcryptjs')
 const {
     validationResult
 } = require('express-validator');
@@ -13,29 +10,29 @@ exports.create = (req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
     let typeConv
-    convert(req.body.type,(callback)=>{
-        typeConv=callback
+    convert(req.body.type, (callback) => {
+        typeConv = callback
     })
-    Type.findOne({ 'type': typeConv})
+    TYPE.findOne({ 'type': typeConv })
         .exec()
         .then((type) => {
             if (type) res.status(typeMessages.success.s3.http).send(typeMessages.success.s3)
             else {
-                const newtype = new Type({
+                const newtype = new TYPE({
                     type: typeConv,
                 })
                 newtype.save()
-                .then((type, error) => {
-                    if (error) throw error
-                    let message = typeMessages.success.s0
-                    message.body = type
-                    return res.status(message.http).send(message)
-                })
-                .catch((error) => {
-                    let message = typeMessages.error.e1
-                    message.body = error
-                    return res.status(message.http).send(message)
-                })
+                    .then((type, error) => {
+                        if (error) throw error
+                        let message = typeMessages.success.s0
+                        message.body = type
+                        return res.status(message.http).send(message)
+                    })
+                    .catch((error) => {
+                        let message = typeMessages.error.e1
+                        message.body = error
+                        return res.status(message.http).send(message)
+                    })
             }
         })
         .catch((error) => {
@@ -49,7 +46,7 @@ exports.create = (req, res) => {
 exports.get = ((req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
-    Type.find()
+    TYPE.find()
         .exec()
         .then((types, error) => {
             if (error) throw error
@@ -69,7 +66,7 @@ exports.delete = (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length > 0)
         return res.status(406).send(errors)
-    Type.deleteOne({ '_id': { $eq: req.params.id } })
+    TYPE.deleteOne({ '_id': { $eq: req.params.id } })
         .exec()
         .then((type) => {
             if (type.deletedCount <= 0)
@@ -87,7 +84,7 @@ exports.getone = (req, res) => {
     if (errors.length > 0) {
         return res.status(406).send(errors)
     }
-    Type.findOne({ '_id': { $eq: req.params.id } })
+    TYPE.findOne({ '_id': { $eq: req.params.id } })
         .exec()
         .then((type) => {
             if (!type)
