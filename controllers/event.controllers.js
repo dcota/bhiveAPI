@@ -1,5 +1,5 @@
-const DEVICE = require('../models/device.models');
-const deviceMessages = require('../messages/device.messages')
+const EVENT = require('../models/event.models');
+const eventMessages = require('../messages/event.messages')
 const {
     validationResult
 } = require('express-validator')
@@ -7,38 +7,33 @@ const {
 exports.create = (req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
-    DEVICE.findOne({ 'deviceref': req.body.deviceref })
+    EVENT.findOne({ 'device': req.body.device }, { 'type': req.body.type }, { 'active': 'true' })
         .exec()
-        .then((device) => {
-            if (device) res.status(deviceMessages.success.s3.http).send(deviceMessages.success.s3)
+        .then((event) => {
+            if (event) res.status(eventMessages.success.s3.http).send(eventMessages.success.s3)
             else {
-                const newdevice = new DEVICE({
-                    apiary: null,
-                    deviceref: req.body.deviceref,
-                    registered: true,
-                    assigned: false,
-                    location: {
-                        lat: 0.0,
-                        lon: 0.0
-                    },
-                    data: []
+                const newevent = new EVENT({
+                    device: req.body.device,
+                    type: req.body.type,
+                    active: true,
+                    res_date: null
                 })
-                newdevice.save()
-                    .then((device, error) => {
+                newevent.save()
+                    .then((event, error) => {
                         if (error) throw error
-                        let message = deviceMessages.success.s0
-                        message.body = device
+                        let message = eventMessages.success.s0
+                        message.body = event
                         return res.status(message.http).send(message)
                     })
                     .catch((error) => {
-                        let message = deviceMessages.error.e1
+                        let message = eventMessages.error.e1
                         message.body = error
                         return res.status(message.http).send(message)
                     })
             }
         })
         .catch((error) => {
-            let message = typeMessages.error.e1
+            let message = eventMessages.error.e1
             message.body = error
             return res.status(message.http).send(message)
         })
@@ -47,14 +42,13 @@ exports.create = (req, res) => {
 exports.get = ((req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
-    DEVICE.find()
+    EVENT.find()
         .exec()
-        .then((device, error) => {
-            console.log(device)
+        .then((events, error) => {
             if (error) throw error
-            if (device == 0) return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-            let message = deviceMessages.success.s1
-            message.body = device
+            if (events == 0) return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+            let message = eventMessages.success.s1
+            message.body = events
             return res.status(message.http).send(message)
         })
         .catch((error) => {
@@ -63,16 +57,46 @@ exports.get = ((req, res) => {
 
 })
 
+exports.changeStatus = (req, res) => {
+    const errors = validationResult(req).array()
+    if (errors.length > 0) {
+        return res.status(406).send(errors)
+    }
+    EVENT.findOneAndUpdate({ 'device': { $eq: req.params.id } }, {
+            $set: {
+                'active': false,
+                'res_date': Date.now(),
+            }
+        }, { new: true })
+        .exec()
+        .then((event) => {
+            if (!event)
+                return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+            let message = eventMessages.success.s6
+            const evn = {
+                device: event.device,
+                active: event.active,
+                registration_date: event.registration_date,
+                res_date: event.res_date
+            }
+            message.body = evn
+            return res.status(message.http).send(message)
+        })
+        .catch(() => {
+            return res.status(eventMessages.error.e1.http).send(eventMessages.error.e1)
+        })
+}
 
-exports.getLatestDataAllDevices = ((req, res) => {
+
+/*exports.getLatestDataAllDevices = ((req, res) => {
     const errors = validationResult(req).array();
     if (errors.length > 0) return res.status(406).send(errors)
     DEVICE.find({ 'apiary': req.params.id })
         .exec()
         .then((devices, error) => {
             if (error) throw error
-            if (devices == 0) return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-            let message = deviceMessages.success.s1
+            if (devices == 0) return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+            let message = eventMessages.success.s1
             let resArray = []
             devices.forEach(element => {
                 let instance = {
@@ -90,9 +114,9 @@ exports.getLatestDataAllDevices = ((req, res) => {
             console.log(error)
         })
 
-})
+})*/
 
-exports.assign = (req, res) => {
+/*exports.assign = (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length > 0) {
         return res.status(406).send(errors)
@@ -101,7 +125,7 @@ exports.assign = (req, res) => {
         .exec()
         .then((device) => {
             if (!device)
-                return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
+                return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
             if (device.apiary == null) {
                 DEVICE.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
                         $set: {
@@ -112,23 +136,23 @@ exports.assign = (req, res) => {
                     .exec()
                     .then((device) => {
                         if (!device)
-                            return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-                        let message = deviceMessages.success.s6
+                            return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+                        let message = eventMessages.success.s6
                         message.body = device
                         return res.status(message.http).send(message)
                     })
                     .catch(() => {
-                        return res.status(deviceMessages.error.e1.http).send(deviceMessages.error.e1)
+                        return res.status(eventMessages.error.e1.http).send(eventMessages.error.e1)
                     })
             } else {
-                let message = deviceMessages.error.e2
+                let message = eventMessages.error.e2
                 return res.status(message.http).send(message)
             }
         })
 
-}
+}*/
 
-exports.updateData = (req, res) => {
+/*exports.updateData = (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length > 0) {
         return res.status(406).send(errors)
@@ -137,7 +161,7 @@ exports.updateData = (req, res) => {
         .exec()
         .then((device) => {
             if (!device)
-                return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
+                return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
             let newData = {
                 tempIn: req.body.tempIn,
                 tempOut: req.body.tempOut,
@@ -158,32 +182,32 @@ exports.updateData = (req, res) => {
                 .exec()
                 .then((device) => {
                     if (!device)
-                        return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-                    let message = deviceMessages.success.s6
+                        return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+                    let message = eventMessages.success.s6
                     message.body = device
                     return res.status(message.http).send(message)
                 })
                 .catch(() => {
-                    return res.status(deviceMessages.error.e1.http).send(deviceMessages.error.e1)
+                    return res.status(eventMessages.error.e1.http).send(eventMessages.error.e1)
                 })
         })
 
-}
+}*/
 
 exports.delete = (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length > 0)
         return res.status(406).send(errors)
-    DEVICE.deleteOne({ '_id': { $eq: req.params.id } })
+    EVENT.deleteOne({ '_id': { $eq: req.params.id } })
         .exec()
-        .then((device) => {
-            if (device.deletedCount <= 0)
-                return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-            let message = deviceMessages.success.s4
+        .then((event) => {
+            if (event.deletedCount <= 0)
+                return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+            let message = eventMessages.success.s4
             return res.status(message.http).send(message)
         })
         .catch(() => {
-            return res.status(deviceMessages.error.e1.http).send(deviceMessages.error.e1)
+            return res.status(eventMessages.error.e1.http).send(eventMessages.error.e1)
         })
 }
 
@@ -192,14 +216,13 @@ exports.getone = (req, res) => {
     if (errors.length > 0) {
         return res.status(406).send(errors)
     }
-    DEVICE.findOne({ '_id': { $eq: req.params.id } })
+    EVENT.findOne({ '_id': { $eq: req.params.id } })
         .exec()
-        .then((device) => {
-            if (!device)
-                return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-            let message = deviceMessages.success.s5
-            console.log(device)
-            const dev = {
+        .then((event) => {
+            if (!event)
+                return res.status(eventMessages.error.e0.http).send(eventMessages.error.e0)
+            let message = eventMessages.success.s5
+            const evn = {
                 apiary: null,
                 deviceref: device.deviceref,
                 registered: device.registered,
@@ -215,6 +238,6 @@ exports.getone = (req, res) => {
             return res.status(message.http).send(message)
         })
         .catch(() => {
-            return res.status(deviceMessages.error.e1.http).send(deviceMessages.error.e1)
+            return res.status(eventMessages.error.e1.http).send(eventMessages.error.e1)
         })
 }
