@@ -2,34 +2,34 @@ module.exports = {
     success: {
         s0: {
             http: 201,
-            code: 'Level created',
+            code: 'Apiary created',
             type: 'success'
         },
         s1: {
             http: 200,
-            code: 'Levels found',
+            code: 'Apiaries found',
             type: 'success'
         },
         s3: {
             http: 200,
-            code: 'Level already exists',
+            code: 'Apiary already exists',
             type: 'success'
         },
         s4: {
             http: 200,
-            code: 'Level deleted',
+            code: 'Apiary deleted',
             type: 'success'
         },
         s5: {
             http: 200,
-            code: 'Level for _id',
+            code: 'Apiary for _id',
             type: 'success'
         }
     },
     error: {
         e0: {
             http: 404,
-            code: 'Level not found'
+            code: 'Apiary not found'
         },
         e1: {
             http: 500,

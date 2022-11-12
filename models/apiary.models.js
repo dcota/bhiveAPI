@@ -2,9 +2,10 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const apiarySchema = new Schema({
-    user: String,
+    user: { type: String, required: true },
     address: String,
-    Observations: String,
+    location: String,
+    observations: String,
     registration_date: {
         type: Date,
         default: Date.now
