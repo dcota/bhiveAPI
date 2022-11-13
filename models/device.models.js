@@ -12,12 +12,12 @@ const deviceSchema = new Schema({
         lon: Number
     },
     data: [{
-        tempIn: Number,
-        tempOut: Number,
-        humIn: Number,
-        humOut: Number,
-        weight: Number,
-        soundLevel: Number,
+        ti: Number,
+        to: Number,
+        hi: Number,
+        ho: Number,
+        w: Number,
+        s: Number,
         date: {
             type: Date,
             default: Date.now

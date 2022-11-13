@@ -26,12 +26,12 @@ router.route('/:id')
 
 router.route('/update/:id')
     .patch([param('id').isMongoId(),
-        body('tempIn').isNumeric(),
-        body('tempOut').isNumeric(),
-        body('humIn').isNumeric(),
-        body('humOut').isNumeric(),
-        body('weight').isNumeric(),
-        body('soundLevel').isNumeric(),
+        body('ti').isNumeric(),
+        body('to').isNumeric(),
+        body('hi').isNumeric(),
+        body('ho').isNumeric(),
+        body('w').isNumeric(),
+        body('s').isNumeric(),
         body('lat').isNumeric(),
         body('lon').isNumeric(),
     ], deviceController.updateData)

@@ -50,7 +50,6 @@ exports.get = ((req, res) => {
     DEVICE.find()
         .exec()
         .then((device, error) => {
-            console.log(device)
             if (error) throw error
             if (device == 0) return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
             let message = deviceMessages.success.s1
@@ -80,7 +79,7 @@ exports.getLatestDataAllDevices = ((req, res) => {
                     lon: element.location.lon,
                     data: element.data[element.data.length - 1]
                 }
-                arr.push(instance)
+                resArray.push(instance)
             });
 
             message.body = resArray
@@ -139,15 +138,14 @@ exports.updateData = (req, res) => {
             if (!device)
                 return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
             let newData = {
-                tempIn: req.body.tempIn,
-                tempOut: req.body.tempOut,
-                humIn: req.body.humIn,
-                humOut: req.body.humOut,
-                weight: req.body.weight,
-                soundLevel: req.body.soundLevel,
+                ti: req.body.ti,
+                to: req.body.to,
+                hi: req.body.hi,
+                ho: req.body.ho,
+                w: req.body.w,
+                s: req.body.s,
                 date: Date.now()
             }
-            console.log(newData)
             DEVICE.findOneAndUpdate({ '_id': { $eq: req.params.id } }, {
                     $set: {
                         'location.lat': req.body.lat,
@@ -198,7 +196,6 @@ exports.getone = (req, res) => {
             if (!device)
                 return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
             let message = deviceMessages.success.s5
-            console.log(device)
             const dev = {
                 apiary: null,
                 deviceref: device.deviceref,
