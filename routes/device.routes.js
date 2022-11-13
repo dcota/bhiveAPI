@@ -25,7 +25,7 @@ router.route('/:id')
     .patch([param('id').isMongoId()], deviceController.assign) //authController.checkAuth
 
 router.route('/update/:id')
-    .patch([param('id').isMongoId(),
+    .post([param('id').isMongoId(),
         body('ti').isNumeric(),
         body('to').isNumeric(),
         body('hi').isNumeric(),

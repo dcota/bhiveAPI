@@ -30,6 +30,11 @@ module.exports = {
             code: 'Device assigned',
             type: 'success'
         },
+        s7: {
+            http: 200,
+            code: 'New data received',
+            type: 'success'
+        },
     },
     error: {
         e0: {

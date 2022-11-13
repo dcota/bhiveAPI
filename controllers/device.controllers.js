@@ -157,8 +157,8 @@ exports.updateData = (req, res) => {
                 .then((device) => {
                     if (!device)
                         return res.status(deviceMessages.error.e0.http).send(deviceMessages.error.e0)
-                    let message = deviceMessages.success.s6
-                    message.body = device
+                    let message = deviceMessages.success.s7
+                        //message.body = device
                     return res.status(message.http).send(message)
                 })
                 .catch(() => {
